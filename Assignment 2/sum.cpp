@@ -3,12 +3,12 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-  
+
 /*
- * This program is a multi-threaded solution for computing the sum of a
- * array of integers. You will have to speficy two arguments. The first 
- * argument is the name of the file and the second is the number of threads.
- */
+* This program is a multi-threaded solution for computing the sum of a
+* array of integers. You will have to speficy two arguments. The first 
+* argument is the name of the file and the second is the number of threads.
+*/
 
 using namespace std; 
 
@@ -19,8 +19,8 @@ int x;
 vector<int> arr;
 
 /*
- * This method will sum of the numbers in the array
- */
+* This method will sum of the numbers in the array
+*/
 void* sum_array(void* arg) 
 {
 	int* a = (int*)arg;
@@ -49,21 +49,21 @@ int main( int argc, char ** argv)
 	int t = stoi(argv[2]);
 	//open file
 	ifstream inFile;
-    inFile.open("text.txt");
+	inFile.open("text.txt");
 	//error checking
-    if (!inFile) 
+	if (!inFile) 
 	{
-        cout << "File Error";
-        exit(1); 
-    }
-    //read each integer to vector
-    while (inFile >> x) 
+		cout << "File Error";
+		exit(1); 
+	}
+	//read each integer to vector
+	while (inFile >> x) 
 	{
-        n += 1;
+		n += 1;
 		arr.push_back(x);
-    }
+	}
 	//close file
-    inFile.close();
+	inFile.close();
 	//calculations for the number of threads in each group
 	int numFirstgroup = n % t;
 	int numSecGroup = t - (n%t);
@@ -103,6 +103,6 @@ int main( int argc, char ** argv)
 	//display the total sum
 	cout <<"Sum = ";
 	cout << total << endl;
-  
-    return 0; 
+
+	return 0; 
 } 
