@@ -31,17 +31,15 @@ int inArray(int n, int a[], int size)
 void optimal(int numFrames, vector<int> v)
 {
     unordered_map<int, int> mymap;
-
     int numPageFaults = 0;
-
+	int count = 0;
     int frame[numFrames];
+	
     //initialize all array values to -1
     for (int i = 0; i<numFrames; i++)
     {
         frame[i] = -1;
     }
-
-    int count = 0;
 
     //for each number in vector
     for (int i = 0; i<v.size(); i++)
@@ -58,12 +56,18 @@ void optimal(int numFrames, vector<int> v)
                 frame[count] = v[i];
                 numPageFaults += 1;
             }
+			//if it's a hit, do do not increase count
+			else
+			{
+				count -= 1;
+			}
         }
+		//when frame is full
         else
         {
+			//look forward
             if (!inArray(v[i], frame, numFrames))
             {
-                //look forward
                 //for each of the numbers in the frame, find the index of the next occruence
                 for (int i = 0; i<numFrames; i++)
                 {
@@ -76,14 +80,11 @@ void optimal(int numFrames, vector<int> v)
                             isInFuture = 1;
                         }
                     }
-
                     if (isInFuture == 0)
                     {
                         mymap[frame[i]] = 99999;
                     }
-
                 }
-
                 int indexThatHasMax;
                 int max = 0;
                 //find the highest index found, which is the one we should replace
@@ -121,14 +122,14 @@ void lru(int numFrames, vector<int> v)
 {
     unordered_map<int, int> mymap;
     int numPageFaults = 0;
+	int count = 0;
     int frame[numFrames];
+	
     //initialize all array values to -1
     for (int i = 0; i<numFrames; i++)
     {
         frame[i] = -1;
     }
-
-    int count = 0;
 
     //for each number in vector
     for (int i = 0; i<v.size(); i++)
@@ -145,26 +146,28 @@ void lru(int numFrames, vector<int> v)
                 frame[count] = v[i];
                 numPageFaults += 1;
             }
+			else
+			{
+				count -= 1;
+			}
         }
         else
         {
+			//look backward
             if (!inArray(v[i], frame, numFrames))
             {
-                //look backward
+                
                 //for each of the numbers in the frame, find the index of the previous occruence
                 for (int i = 0; i<numFrames; i++)
                 {
-                    
                     for (int j = 0; j<currentIndex; j++)
                     {
                         if (frame[i] == v[j])
                         {
                             mymap[frame[i]] = j;
-                            
                         }
                     }
                 }
-
                 int indexThatHasMin;
                 int min = 99999;
                 //find the lowest index found, which is the one we should replace
@@ -211,10 +214,9 @@ int incrementClockPointer(int current, int max)
 void clock(int numFrames, vector<int> v)
 {
     int numPageFaults = 0;
+	int count = 0;
     int frame[numFrames];
     int flag[numFrames];
-
-
     int pointer = 0;
 
     //initialize all array values to -1
@@ -223,9 +225,6 @@ void clock(int numFrames, vector<int> v)
         frame[i] = -1;
         flag[i] = 0;
     }
-
-
-    int count = 0;
 
     //for each number in vector
     for (int i = 0; i<v.size(); i++)
@@ -320,32 +319,25 @@ void clock(int numFrames, vector<int> v)
         }
 
 
-        // cout << "current state after seeing " << v[i] << endl;
+        cout << "current state after seeing " << v[i] << endl;
 
         
-        // for (int i = 0; i<numFrames; i++)
-        // {
-        //     cout << frame[i] << endl;
-        // }
-
-
-
-
+        for (int i = 0; i<numFrames; i++)
+        {
+            cout << frame[i] << endl;
+        }
 
 
         count += 1;
     }
 
 
-
-
-
-    string frameOutput = "4 5 2 3";
-    numPageFaults = 10;
+    string frameOutput;// = "4 5 2 3";
+    //numPageFaults = 10;
     //get the state of frames at the end
     for (int i = 0; i<numFrames; i++)
     {
-        //frameOutput += to_string(frame[i]) + " ";
+        frameOutput += to_string(frame[i]) + " ";
     }
 
     cout << "Clock:" << endl;
@@ -380,8 +372,8 @@ int main(int argc, char *argv[])
         }
 	}    
 
-    optimal(numFrames, v);
-    lru(numFrames, v);
+    //optimal(numFrames, v);
+    //lru(numFrames, v);
     clock(numFrames, v);
 
 	return 0;

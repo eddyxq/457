@@ -66,20 +66,13 @@ int checkConsistency( int blockSize, std::vector<DEntry> &files, std::vector<int
 {
     set<int> blockUsed;
 
-    //for each FAT entry
-    for (int i = 0; i < fat.size(); i++)
-    {
-        //cout << i << " ";
-        //cout << fat[i] << endl;
-    }
-
-    //cout << endl;
-
     //for each file
-    //cout << "files info" << endl;
     for (int i = 0; i < files.size(); i++)
-    //for (int i = 0; i < 1; i++)
+    //for (int i = 6; i < 7; i++)
     {
+		
+		cout << "file size: " << files[i].size << endl;
+		
         //set everything to false to start
         files[i].hasCycle = false;
         files[i].tooFewBlocks = false;
@@ -87,20 +80,14 @@ int checkConsistency( int blockSize, std::vector<DEntry> &files, std::vector<int
         files[i].sharesBlocks = false;
 
 
-
-        //cout << files[i].size << endl;
-
         //calc number of blocks
         int numBlocks = ceil(float(files[i].size) / float(blockSize));
-        //cout << "numBlocks " << numBlocks << endl;
-
-        //cout << "start ind " << files[i].ind << endl;
 
         //calc how many blocks used in table
-        int count = 0;
         int current = files[i].ind;
         set<int> set; 
-        //set<int> blockUsed;
+		
+		int setSize = 0;
 
 
         int notEmpty = 1;
@@ -122,15 +109,12 @@ int checkConsistency( int blockSize, std::vector<DEntry> &files, std::vector<int
 
         while(notEmpty)
         {
-            //cout << current << endl;
-             //blocks used increase by 1
-                //count +=1;
 
             //if it points to -1 break
             if (fat[current] == -1)
             {
-                count += 1;
                 set.insert(current);
+				setSize++;
                 files[i].traversedblocks.insert(current);
                 blockUsed.insert(current);
 
@@ -140,17 +124,12 @@ int checkConsistency( int blockSize, std::vector<DEntry> &files, std::vector<int
             else 
             {
                 //check if current index is in the set
-                if (find(set.begin(), set.end(), fat[current]) != set.end())
+                if (find(set.begin(), set.end(), fat[current]) != set.end() || current == fat[current])
                 {
                     //if already in set, means there is cycle, so break
                     files[i].hasCycle = true;
-                    //count +=1;
-                    //set.insert(-1);
-                    //cout << "BROKEN OUT OF LOOP HERE" << endl;
-
-
-                    //cout << "number here is " << current << endl;
                     set.insert(current);
+					setSize++;
                     files[i].traversedblocks.insert(current);
                     blockUsed.insert(current);
                     break;
@@ -160,48 +139,30 @@ int checkConsistency( int blockSize, std::vector<DEntry> &files, std::vector<int
                 {
                     files[i].traversedblocks.insert(current);
                     set.insert(current);
+					setSize++;
                     blockUsed.insert(current);
-                    //count +=1;
-
-
-                     //cout << "inserting " << current << endl;
-
-            
-
-
                 }
-
-                //add to block user
-                //blockUsed.insert(current);
-
-                
-
                 //change pointer
                 current = fat[current];
 
 
             }
-           
-            count += 1;
         }
 
-        //cout << "size of set: " << set.size() << endl;
 
         //cout <<" this set has :" << endl;
         //for (auto it=set.begin(); it != set.end(); ++it) 
         //cout << ' ' << *it; 
-
-
-        // set.clear();
-        //cout << "this file traversed " << count << endl;
+		
+		cout << "size of set: " << set.size() << endl;
+		cout << "new set num: " << setSize << endl;
 
         //check if too many blocks or too few blocks
-
         int min = (set.size()-1) * blockSize + 1;
         int max = (set.size() * blockSize);
 
-        //cout << "min " << min << endl;
-        //cout << "max " << max << endl;
+        cout << "min " << min << endl;
+        cout << "max " << max << endl;
 
 
         if (files[i].ind != -1 && files[i].size < min)
@@ -212,27 +173,10 @@ int checkConsistency( int blockSize, std::vector<DEntry> &files, std::vector<int
         {
             files[i].tooFewBlocks = true;
         }
-
-        // if(numBlocks == set.size())
-        // {
-        //     cout << "enough blocks" << endl;
-        // }
-        // else if(set.size() < numBlocks)
-        // {
-        //     files[i].tooFewBlocks = true;
-        // }
-        // else if (numBlocks < set.size())
-        // {
-        //     files[i].tooManyBlocks = true;
-        // }
-
-    
     }
 
     //now check if any of the sets intersect
-
     //for each file
-    
     for (int i = 0; i < files.size(); i++)
     {
         //if any of the files intersect with another file break
@@ -243,12 +187,8 @@ int checkConsistency( int blockSize, std::vector<DEntry> &files, std::vector<int
                 files[i].sharesBlocks = true;
                 break;
             }
-
-            //cout << blocksIntersect(files[i].traversedblocks, files[j].traversedblocks);
-
         }
     }
-
 
     // finally, return the number of free blocks
     return fat.size() - blockUsed.size();
